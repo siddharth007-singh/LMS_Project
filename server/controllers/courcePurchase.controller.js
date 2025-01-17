@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import {User} from "../models/user.model.js";
 import { Course } from "../models/cource.model.js";
 import { CourcePurchase } from '../models/courcePurchase.model.js';
 import { Lecture } from '../models/lecture.model.js';
@@ -51,7 +52,9 @@ export const createCheckOutSession = async (req, res) => {
         });
 
         if (!session.url) {
-            return res.status(400).json({ success: false, message: "Something went wrong" });
+          return res
+            .status(400)
+            .json({ success: false, message: "Error while creating session" });
         }
 
         //Save the Purchsed Record
@@ -73,8 +76,11 @@ export const stripeWebhook = async (req, res) => {
       const payloadString = JSON.stringify(req.body, null, 2);
       const secret = process.env.WEBHOOK_ENDPOINT_SECRET;
   
-      // Validate the webhook signature
-      event = stripe.webhooks.constructEvent(payloadString, req.headers["stripe-signature"], secret);
+      const header = stripe.webhooks.generateTestHeaderString({
+        payload: payloadString,
+        secret,
+      });
+      event = stripe.webhooks.constructEvent(payloadString, header, secret);
     } catch (error) {
       console.error("Webhook error:", error.message);
       return res.status(400).send(`Webhook error: ${error.message}`);
@@ -97,12 +103,13 @@ export const stripeWebhook = async (req, res) => {
           console.error("No purchase found for payment ID:", session.id);
           return res.status(404).send("Purchase record not found");
         }
-  
-        // Update purchase details
-        purchase.status = "completed";
+
         if (session.amount_total) {
           purchase.amount = session.amount_total / 100;
         }
+  
+        // Update purchase details
+        purchase.status = "completed";
   
         // Make all lectures visible
         if (purchase.courceId && purchase.courceId.lectures.length > 0) {

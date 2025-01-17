@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const courcePurchaseSchema = new mongoose.Schema({
     courceId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Cource",
+        ref: "Course",
         required: true,
     },
     userId: {
@@ -21,15 +21,10 @@ const courcePurchaseSchema = new mongoose.Schema({
         enum: ['pending', 'completed', 'failed'],
         default: "pending",
     },
-    razorpayOrderId: {
-        type: String,
-    },
-    razorpayPaymentId: {
-        type: String,
-    },
-    razorpaySignature: {
-        type: String,
-    },
+    paymentId:{
+        type:String,
+        required:true
+    }
 }, { timeStamp: true });
 
 export const CourcePurchase = mongoose.model("CourcePurchase", courcePurchaseSchema);
