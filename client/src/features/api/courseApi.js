@@ -47,7 +47,7 @@ export const courseApi = createApi({
             query:()=>({
                 url: "/published-cources",
                 method: "GET",
-            }),
+            }), 
         }),
 
         getCourceById: builder.query({

@@ -5,6 +5,7 @@ import {useGetPublishedCourcesQuery } from '@/features/api/courseApi';
 
 const Cources = () => {
     const {data, isLoading, isError} = useGetPublishedCourcesQuery();
+    console.log(data);
 
     if(isError) return <h1>Some Error Ocurred</h1>
 
@@ -19,7 +20,7 @@ const Cources = () => {
                             <CourseSkeleton key={index} />
                         )) : (
                             // <Cource />
-                            data.cource && data.cource.map((cource, index) => <Cource key={index} cource={cource} />)
+                            data?.cource && data.cource.map((cource, index) => <Cource key={index} cource={cource} />)
                         )
                     }
 

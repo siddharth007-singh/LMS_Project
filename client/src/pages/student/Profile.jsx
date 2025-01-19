@@ -47,7 +47,7 @@ const Profile = () => {
 
     if(isLoading) return <h1>Profile Loading...</h1>
     //Destructing
-    const user = data?.user;
+    const {user} = data;
 
     return (
         <div className="max-w-4xl mx-auto px-4 my-10">

@@ -12,17 +12,23 @@ import { BadgeInfo, Lock, PlayCircle } from "lucide-react";
 import ReactPlayer from "react-player";
 import { Separator } from "@/components/ui/separator";
 import BuyCourseButton from '@/components/BuyCourseButton';
-import { useGetCourceByIdQuery } from '@/features/api/courseApi';
 import { useParams } from 'react-router-dom';
+import { useGetCourceDetailsWithStatusQuery } from '@/features/api/purchaseApi';
 
 
 
 const CourceDetails = () => {
     const { courceId } = useParams();
-    const { data, isLoading, isError, error } = useGetCourceByIdQuery(courceId);
+    const { data, isLoading, isError } = useGetCourceDetailsWithStatusQuery(courceId);
 
-    const purchased = false;
+    console.log(data);  
+
     const handleContinueCourse = async() => {}
+
+    if(isLoading) return <div>Loading...</div>
+    if(isError) return <h1>Failed to load CourseDetails</h1>
+
+    const {cource, purchsed} = data;
 
 
     
@@ -31,20 +37,20 @@ const CourceDetails = () => {
             <div className="bg-[#2D2F31] text-white">
                 <div className="max-w-7xl mx-auto py-8 px-4 md:px-8 flex flex-col gap-2">
                     <h1 className="font-bold text-2xl md:text-3xl">
-                        Course Title
+                        {cource?.courceTitle}
                     </h1>
-                    <p className="text-base md:text-lg">Course Sub-title</p>
+                    <p className="text-base md:text-lg">{cource?.subTitle}</p>
                     <p>
                         Created By{" "}
                         <span className="text-[#C0C4FC] underline italic">
-                            Creator Name
-                        </span>
+                            {cource?.creator.name}
+                        </span> 
                     </p>
                     <div className="flex items-center gap-2 text-sm">
                         <BadgeInfo size={16} />
-                        <p>Last updated CreatedAt</p>
+                        <p>Last updated {cource?.createdAt.split("T")[0]}</p>
                     </div>
-                    <p>Students enrolled: Enrolled Student</p>
+                    <p>Students enrolled: {cource?.enrolledStudents.length}</p>
                 </div>
             </div>
 
@@ -86,7 +92,7 @@ const CourceDetails = () => {
                             <h1 className="text-lg md:text-xl font-semibold">Course Price</h1>
                         </CardContent>
                         <CardFooter className="flex justify-center p-4">
-                            {purchased ? (
+                            {purchsed ? (
                                 <Button onClick={handleContinueCourse} className="w-full">Continue Course</Button>
                             ) : (
                                 <BuyCourseButton courceId={courceId}/>

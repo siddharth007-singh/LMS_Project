@@ -3,6 +3,7 @@ import {User} from "../models/user.model.js";
 import { Course } from "../models/cource.model.js";
 import { CourcePurchase } from '../models/courcePurchase.model.js';
 import { Lecture } from '../models/lecture.model.js';
+import path from "path";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -143,4 +144,41 @@ export const stripeWebhook = async (req, res) => {
     res.status(200).send();
   };
 
-// 12:26:01  Stripe Payement Gateway Integration
+
+
+  export const getCourcedetailsWithPurchasedStatus = async (req, res) => {
+    try {
+        const {courceId} = req.params;
+        const userId = req.id;
+
+        const cource = await Course.findById(courceId).populate({path:"creator", select:"name email"}).populate({path: "lectures"});
+
+        const purchsed = await CourcePurchase.findOne({courceId, userId});
+
+        if(!cource) return res.status(404).json({message: "Cource not found"});
+
+        return res.status(200).json({cource, purchsed:!!purchsed});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  export const getAllPurchasedCources = async (req, res) => {
+    try {
+        const userId = req.id;
+
+        const purchasedCources = await CourcePurchase.find({userId, status: "completed"}).populate("courceId");
+
+        if(!purchasedCources) return res.status(404).json({purchasedCources:[]});
+
+        return res.status(200).json({purchasedCources});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+// 12:26:01  Stripe Payement Gateway Integration...
+
+
